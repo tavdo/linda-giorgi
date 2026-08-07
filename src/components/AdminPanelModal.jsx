@@ -16,6 +16,9 @@ import {
   Lock,
   KeyRound,
   ShieldCheck,
+  Images,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 
 export default function AdminPanelModal() {
@@ -69,6 +72,55 @@ export default function AdminPanelModal() {
       'timelineEvents',
       config.timelineEvents.filter((ev) => ev.id !== id)
     );
+  };
+
+  const galleryPhotos = Array.isArray(config.galleryPhotos) ? config.galleryPhotos : [];
+
+  const handleGalleryPhotoChange = (id, field, value) => {
+    updateConfig(
+      'galleryPhotos',
+      galleryPhotos.map((photo) => (photo.id === id ? { ...photo, [field]: value } : photo))
+    );
+  };
+
+  const addGalleryPhoto = () => {
+    const nextNum = galleryPhotos.length + 1;
+    updateConfig('galleryPhotos', [
+      ...galleryPhotos,
+      {
+        id: Date.now().toString(),
+        src: `/assets/${nextNum}.jpeg`,
+        alt: `ლინდა და გიორგი — ფოტო ${nextNum}`,
+        layout: 'square',
+      },
+    ]);
+  };
+
+  const removeGalleryPhoto = (id) => {
+    updateConfig(
+      'galleryPhotos',
+      galleryPhotos.filter((photo) => photo.id !== id)
+    );
+  };
+
+  const moveGalleryPhoto = (id, direction) => {
+    const index = galleryPhotos.findIndex((photo) => photo.id === id);
+    if (index < 0) return;
+    const target = index + direction;
+    if (target < 0 || target >= galleryPhotos.length) return;
+    const next = [...galleryPhotos];
+    const [item] = next.splice(index, 1);
+    next.splice(target, 0, item);
+    updateConfig('galleryPhotos', next);
+  };
+
+  const handleGalleryUpload = (id, file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      handleGalleryPhotoChange(id, 'src', reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   // CSV Export for RSVPs
@@ -341,6 +393,7 @@ export default function AdminPanelModal() {
                 {[
                   { id: 'general', label: '💑 წყვილი & ჰერო', icon: <User size={15} /> },
                   { id: 'story', label: '📖 ისტორია', icon: <FileText size={15} /> },
+                  { id: 'gallery', label: '🖼️ გალერეა', icon: <Images size={15} /> },
                   { id: 'venue', label: '📍 დეტალები & რუკა', icon: <MapPin size={15} /> },
                   { id: 'timeline', label: '🕒 განრიგი', icon: <Clock size={15} /> },
                   { id: 'music', label: '🎵 მუსიკა', icon: <Music size={15} /> },
@@ -500,6 +553,191 @@ export default function AdminPanelModal() {
                   </div>
                 )}
 
+                {/* TAB: GALLERY */}
+                {activeTab === 'gallery' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div>
+                        <label className="admin-label">სექციის სათაური</label>
+                        <input
+                          className="admin-input"
+                          type="text"
+                          value={config.galleryTitle || ''}
+                          onChange={(e) => updateConfig('galleryTitle', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="admin-label">ქვესათაური</label>
+                        <input
+                          className="admin-input"
+                          type="text"
+                          value={config.gallerySubtitle || ''}
+                          onChange={(e) => updateConfig('gallerySubtitle', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '12px',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <span style={{ fontSize: '14px', color: 'var(--ink-muted)' }}>
+                        ფოტოები ({galleryPhotos.length}) — გზა `/assets/...` ან ატვირთვა
+                      </span>
+                      <button
+                        onClick={addGalleryPhoto}
+                        className="btn-primary"
+                        style={{ padding: '8px 16px', fontSize: '12px' }}
+                      >
+                        <Plus size={14} /> ფოტოს დამატება
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {galleryPhotos.map((photo, index) => (
+                        <div
+                          key={photo.id}
+                          style={{
+                            padding: '16px',
+                            border: '1px solid #EAE2D9',
+                            borderRadius: '12px',
+                            background: '#FDFBF7',
+                            display: 'grid',
+                            gridTemplateColumns: '88px 1fr auto',
+                            gap: '14px',
+                            alignItems: 'start',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: '88px',
+                              height: '88px',
+                              borderRadius: '10px',
+                              overflow: 'hidden',
+                              background: '#EAE2D9',
+                              border: '1px solid #EAE2D9',
+                            }}
+                          >
+                            {photo.src ? (
+                              <img
+                                src={photo.src}
+                                alt=""
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              />
+                            ) : null}
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0 }}>
+                            <div>
+                              <label className="admin-label">ფოტოს გზა / URL</label>
+                              <input
+                                className="admin-input"
+                                type="text"
+                                value={photo.src || ''}
+                                placeholder="/assets/1.jpeg"
+                                onChange={(e) => handleGalleryPhotoChange(photo.id, 'src', e.target.value)}
+                              />
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: '10px' }}>
+                              <div>
+                                <label className="admin-label">აღწერა (Alt)</label>
+                                <input
+                                  className="admin-input"
+                                  type="text"
+                                  value={photo.alt || ''}
+                                  onChange={(e) => handleGalleryPhotoChange(photo.id, 'alt', e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <label className="admin-label">ზომა</label>
+                                <select
+                                  className="admin-input"
+                                  value={photo.layout || 'square'}
+                                  onChange={(e) => handleGalleryPhotoChange(photo.id, 'layout', e.target.value)}
+                                >
+                                  <option value="tall">მაღალი</option>
+                                  <option value="wide">ფართო</option>
+                                  <option value="square">კვადრატი</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="admin-label">ახალი ფოტოს ატვირთვა</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleGalleryUpload(photo.id, file);
+                                  e.target.value = '';
+                                }}
+                                style={{ fontSize: '13px', color: 'var(--ink-muted)' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={() => moveGalleryPhoto(photo.id, -1)}
+                              disabled={index === 0}
+                              title="ზემოთ"
+                              style={{
+                                background: '#FFFFFF',
+                                border: '1px solid #EAE2D9',
+                                borderRadius: '8px',
+                                padding: '8px',
+                                cursor: index === 0 ? 'not-allowed' : 'pointer',
+                                opacity: index === 0 ? 0.4 : 1,
+                              }}
+                            >
+                              <ArrowUp size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveGalleryPhoto(photo.id, 1)}
+                              disabled={index === galleryPhotos.length - 1}
+                              title="ქვემოთ"
+                              style={{
+                                background: '#FFFFFF',
+                                border: '1px solid #EAE2D9',
+                                borderRadius: '8px',
+                                padding: '8px',
+                                cursor: index === galleryPhotos.length - 1 ? 'not-allowed' : 'pointer',
+                                opacity: index === galleryPhotos.length - 1 ? 0.4 : 1,
+                              }}
+                            >
+                              <ArrowDown size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryPhoto(photo.id)}
+                              title="წაშლა"
+                              style={{
+                                background: '#FEE2E2',
+                                color: '#DC2626',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '8px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* TAB 3: VENUE & DETAILS */}
                 {activeTab === 'venue' && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -633,15 +871,15 @@ export default function AdminPanelModal() {
                 {activeTab === 'music' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div>
-                      <label className="admin-label">YouTube ვიდეოს ID (მაგ: NaZznqme2hg)</label>
+                      <label className="admin-label">აუდიო ფაილის გზა / URL</label>
                       <input
                         className="admin-input"
                         type="text"
-                        value={config.musicTrackId}
-                        onChange={(e) => updateConfig('musicTrackId', e.target.value)}
+                        value={config.musicTrackSrc || '/assets/background-music.mp3'}
+                        onChange={(e) => updateConfig('musicTrackSrc', e.target.value)}
                       />
                       <span style={{ fontSize: '12px', color: 'var(--ink-muted)', marginTop: '4px', display: 'block' }}>
-                        ბმულიდან https://www.youtube.com/watch?v=<b>NaZznqme2hg</b>
+                        მაგ: <b>/assets/background-music.mp3</b>
                       </span>
                     </div>
 

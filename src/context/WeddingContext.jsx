@@ -21,8 +21,24 @@ const DEFAULT_CONFIG = {
   dressCodeTitle: 'სადღესასწაულო & ელეგანტური',
   dressCodeSub: 'პასტელური & ნაზი ტონები',
   
-  musicTrackId: '-Ai3nowbLU8',
-  musicTrackTitle: 'საქორწინო მელოდია',
+  musicTrackSrc: '/assets/background-music.mp3',
+  musicTrackTitle: 'საარშიყო — ჯანსუღ კახიძე',
+
+  galleryTitle: 'გალერეა',
+  gallerySubtitle: 'ჩვენი მომენტები — სიყვარულის ამბავი ფოტოებში',
+  galleryPhotos: [
+    { id: '1', src: '/assets/1.jpeg', alt: 'ლინდა და გიორგი — ფოტო 1', layout: 'tall' },
+    { id: '2', src: '/assets/2.jpeg', alt: 'ლინდა და გიორგი — ფოტო 2', layout: 'wide' },
+    { id: '3', src: '/assets/3.jpeg', alt: 'ლინდა და გიორგი — ფოტო 3', layout: 'square' },
+    { id: '4', src: '/assets/4.jpeg', alt: 'ლინდა და გიორგი — ფოტო 4', layout: 'tall' },
+    { id: '5', src: '/assets/5.jpeg', alt: 'ლინდა და გიორგი — ფოტო 5', layout: 'square' },
+    { id: '6', src: '/assets/6.jpeg', alt: 'ლინდა და გიორგი — ფოტო 6', layout: 'wide' },
+    { id: '7', src: '/assets/7.jpeg', alt: 'ლინდა და გიორგი — ფოტო 7', layout: 'square' },
+    { id: '8', src: '/assets/8.jpeg', alt: 'ლინდა და გიორგი — ფოტო 8', layout: 'tall' },
+    { id: '9', src: '/assets/9.jpeg', alt: 'ლინდა და გიორგი — ფოტო 9', layout: 'square' },
+    { id: '10', src: '/assets/10.jpeg', alt: 'ლინდა და გიორგი — ფოტო 10', layout: 'wide' },
+    { id: '11', src: '/assets/11.jpeg', alt: 'ლინდა და გიორგი — ფოტო 11', layout: 'tall' },
+  ],
 
   footerMessage: 'თქვენი თანადგომა და სითბო ჩვენთვის ამ დღეს კიდევ უფრო განსაკუთრებულს გახდის. მოუთმენლად გელოდებით!',
 
@@ -73,11 +89,27 @@ export function WeddingProvider({ children }) {
       const saved = localStorage.getItem('wedding_site_config_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (!parsed.musicTrackId || parsed.musicTrackId === 'NaZznqme2hg') {
-          parsed.musicTrackId = '-Ai3nowbLU8';
-          parsed.musicTrackTitle = 'საქორწინო მელოდია';
+        // Migrate from YouTube IDs to local MP3 background track
+        if (!parsed.musicTrackSrc) {
+          parsed.musicTrackSrc = DEFAULT_CONFIG.musicTrackSrc;
+          if (
+            !parsed.musicTrackTitle ||
+            parsed.musicTrackTitle === 'Romantic Symphony' ||
+            parsed.musicTrackTitle === 'საქორწინო მელოდია'
+          ) {
+            parsed.musicTrackTitle = DEFAULT_CONFIG.musicTrackTitle;
+          }
         }
-        return parsed;
+        return {
+          ...DEFAULT_CONFIG,
+          ...parsed,
+          galleryPhotos: Array.isArray(parsed.galleryPhotos) && parsed.galleryPhotos.length
+            ? parsed.galleryPhotos
+            : DEFAULT_CONFIG.galleryPhotos,
+          timelineEvents: Array.isArray(parsed.timelineEvents) && parsed.timelineEvents.length
+            ? parsed.timelineEvents
+            : DEFAULT_CONFIG.timelineEvents,
+        };
       }
       return DEFAULT_CONFIG;
     } catch (e) {

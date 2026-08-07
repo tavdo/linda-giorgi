@@ -2,44 +2,43 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { useWedding } from '../context/WeddingContext';
 
-const parseYouTubeId = (input) => {
-  if (!input) return '-Ai3nowbLU8';
-  const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-  return match ? match[1] : input.trim();
-};
+const DEFAULT_TRACK = '/assets/background-music.mp3';
 
 export default function MusicPlayer() {
   const { config } = useWedding();
-  const { musicTrackId, musicTrackTitle } = config;
+  const {
+    musicTrackSrc = DEFAULT_TRACK,
+    musicTrackTitle = 'საარშიყო',
+  } = config;
 
-  const cleanTrackId = parseYouTubeId(musicTrackId);
+  const trackSrc = musicTrackSrc || DEFAULT_TRACK;
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const playerRef = useRef(null);
+  const audioRef = useRef(null);
   const userPausedRef = useRef(false);
   const gestureCleanupRef = useRef(null);
 
-  const startWithSound = (player = playerRef.current) => {
-    if (!player || typeof player.playVideo !== 'function') return;
-    try {
-      player.unMute();
-      player.setVolume(100);
-      player.playVideo();
-      setIsMuted(false);
-    } catch {
-      // Browser may block until a user gesture
-    }
+  const hasSound = () => {
+    const audio = audioRef.current;
+    return !!(audio && !audio.paused && !audio.muted && audio.volume > 0);
   };
 
-  const hasSound = (player = playerRef.current) => {
+  const startWithSound = async () => {
+    const audio = audioRef.current;
+    if (!audio) return false;
+
     try {
-      return (
-        player?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING &&
-        !player?.isMuted?.()
-      );
+      audio.muted = false;
+      audio.volume = 1;
+      setIsMuted(false);
+      await audio.play();
+      setIsPlaying(true);
+      return true;
     } catch {
+      // Browser blocked autoplay until a user gesture
+      setIsPlaying(false);
       return false;
     }
   };
@@ -47,11 +46,10 @@ export default function MusicPlayer() {
   const armGestureFallback = () => {
     if (gestureCleanupRef.current) return;
 
-    const onGesture = () => {
+    const onGesture = async () => {
       if (userPausedRef.current) return;
-      startWithSound();
-      // Keep listening until sound is actually on (browser may need the gesture)
-      if (hasSound()) cleanup();
+      const started = await startWithSound();
+      if (started || hasSound()) cleanup();
     };
 
     const events = ['pointerdown', 'touchstart', 'keydown', 'click'];
@@ -67,123 +65,81 @@ export default function MusicPlayer() {
   };
 
   useEffect(() => {
-    if (!window.YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    const audio = audioRef.current;
+    if (!audio) return undefined;
 
-      window.onYouTubeIframeAPIReady = initPlayer;
-    } else {
-      initPlayer();
-    }
+    userPausedRef.current = false;
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.src = trackSrc;
+    audio.load();
 
-    function initPlayer() {
-      if (playerRef.current) return;
-      playerRef.current = new window.YT.Player('yt-hidden-player', {
-        height: '1',
-        width: '1',
-        videoId: cleanTrackId,
-        playerVars: {
-          autoplay: 1,
-          mute: 0,
-          controls: 0,
-          loop: 1,
-          playlist: cleanTrackId,
-          modestbranding: 1,
-          disablekb: 1,
-          fs: 0,
-        },
-        events: {
-          onReady: (event) => {
-            setIsLoaded(true);
-            startWithSound(event.target);
-            armGestureFallback();
+    const onCanPlay = async () => {
+      setIsLoaded(true);
+      const started = await startWithSound();
+      if (!started && !userPausedRef.current) {
+        armGestureFallback();
+      } else {
+        gestureCleanupRef.current?.();
+      }
+    };
 
-            window.setTimeout(() => {
-              if (userPausedRef.current) return;
-              if (hasSound(event.target)) {
-                gestureCleanupRef.current?.();
-              } else {
-                // Keep waiting for a tap — never fall back to muted playback
-                startWithSound(event.target);
-                armGestureFallback();
-              }
-            }, 600);
-          },
-          onStateChange: (event) => {
-            if (event.data === window.YT.PlayerState.PLAYING) {
-              setIsPlaying(true);
-              // Only drop gesture listeners once audio is actually unmuted
-              if (!event.target.isMuted?.()) {
-                gestureCleanupRef.current?.();
-                setIsMuted(false);
-              } else {
-                // YouTube started muted — force unmute; keep gesture fallback if needed
-                startWithSound(event.target);
-                armGestureFallback();
-                try {
-                  setIsMuted(!!event.target.isMuted?.());
-                } catch {
-                  setIsMuted(true);
-                }
-              }
-            } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
-              setIsPlaying(false);
-            }
-          },
-        },
-      });
-    }
+    const onPlay = () => {
+      setIsPlaying(true);
+      if (!audio.muted) gestureCleanupRef.current?.();
+    };
+
+    const onPause = () => setIsPlaying(false);
+    const onVolumeChange = () => setIsMuted(audio.muted || audio.volume === 0);
+
+    audio.addEventListener('canplaythrough', onCanPlay);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('volumechange', onVolumeChange);
+
+    // Try immediately as well (in case already buffered)
+    startWithSound().then((started) => {
+      if (!started && !userPausedRef.current) armGestureFallback();
+    });
 
     return () => {
       gestureCleanupRef.current?.();
+      audio.removeEventListener('canplaythrough', onCanPlay);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('volumechange', onVolumeChange);
+      audio.pause();
     };
-  }, [cleanTrackId]);
+  }, [trackSrc]);
 
-  const togglePlay = () => {
-    if (!playerRef.current || !isLoaded) {
-      setIsPlaying(!isPlaying);
-      return;
-    }
-    if (isPlaying) {
+  const togglePlay = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (!audio.paused) {
       userPausedRef.current = true;
       gestureCleanupRef.current?.();
-      playerRef.current.pauseVideo();
-    } else {
-      userPausedRef.current = false;
-      startWithSound();
+      audio.pause();
+      setIsPlaying(false);
+      return;
     }
+
+    userPausedRef.current = false;
+    await startWithSound();
   };
 
   const toggleMute = () => {
-    if (!playerRef.current || !isLoaded) return;
-    if (isMuted) {
-      playerRef.current.unMute();
-      setIsMuted(false);
-    } else {
-      playerRef.current.mute();
-      setIsMuted(true);
-    }
+    const audio = audioRef.current;
+    if (!audio || !isLoaded) return;
+    audio.muted = !audio.muted;
+    if (!audio.muted) audio.volume = 1;
+    setIsMuted(audio.muted);
   };
 
   return (
     <>
-      {/* Hidden YouTube iframe container */}
-      <div
-        id="yt-hidden-player"
-        style={{
-          position: 'fixed',
-          top: -100,
-          left: -100,
-          width: 1,
-          height: 1,
-          opacity: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      <audio ref={audioRef} playsInline preload="auto" style={{ display: 'none' }} />
 
-      {/* Floating Glassmorphism Audio Control Bar */}
       <div
         style={{
           position: 'fixed',
@@ -246,7 +202,7 @@ export default function MusicPlayer() {
               fontStyle: 'italic',
             }}
           >
-            {isPlaying ? musicTrackTitle || 'Romantic Symphony' : 'დააჭირეთ დასაკრავად'}
+            {isPlaying ? musicTrackTitle : 'დააჭირეთ დასაკრავად'}
           </span>
         </div>
 
