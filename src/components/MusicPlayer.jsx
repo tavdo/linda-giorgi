@@ -18,6 +18,44 @@ export default function MusicPlayer() {
   const [isMuted, setIsMuted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const playerRef = useRef(null);
+  const userPausedRef = useRef(false);
+  const gestureCleanupRef = useRef(null);
+
+  const startPlayback = (player = playerRef.current, { muted = false } = {}) => {
+    if (!player || typeof player.playVideo !== 'function') return;
+    try {
+      player.setVolume(100);
+      if (muted) {
+        player.mute();
+        setIsMuted(true);
+      } else {
+        player.unMute();
+        setIsMuted(false);
+      }
+      player.playVideo();
+    } catch {
+      // Autoplay may still be blocked until a user gesture
+    }
+  };
+
+  const armGestureFallback = () => {
+    if (gestureCleanupRef.current) return;
+
+    const onGesture = () => {
+      if (userPausedRef.current) return;
+      startPlayback(playerRef.current, { muted: false });
+      cleanup();
+    };
+
+    const events = ['pointerdown', 'touchstart', 'keydown', 'click'];
+    const cleanup = () => {
+      events.forEach((eventName) => document.removeEventListener(eventName, onGesture));
+      gestureCleanupRef.current = null;
+    };
+
+    events.forEach((eventName) => document.addEventListener(eventName, onGesture, { once: true, passive: true }));
+    gestureCleanupRef.current = cleanup;
+  };
 
   useEffect(() => {
     if (!window.YT) {
@@ -38,7 +76,7 @@ export default function MusicPlayer() {
         width: '1',
         videoId: cleanTrackId,
         playerVars: {
-          autoplay: 0,
+          autoplay: 1,
           controls: 0,
           loop: 1,
           playlist: cleanTrackId,
@@ -47,12 +85,34 @@ export default function MusicPlayer() {
           fs: 0,
         },
         events: {
-          onReady: () => {
+          onReady: (event) => {
             setIsLoaded(true);
+            // Prefer unmuted autoplay; fall back to muted + unmute on first tap
+            startPlayback(event.target, { muted: false });
+
+            window.setTimeout(() => {
+              if (userPausedRef.current) return;
+              const state = event.target.getPlayerState?.();
+              const playing = state === window.YT?.PlayerState?.PLAYING;
+
+              if (!playing) {
+                startPlayback(event.target, { muted: true });
+              }
+
+              // Unmute / start with sound on first interaction if needed
+              try {
+                if (!playing || event.target.isMuted?.()) {
+                  armGestureFallback();
+                }
+              } catch {
+                armGestureFallback();
+              }
+            }, 600);
           },
           onStateChange: (event) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
               setIsPlaying(true);
+              gestureCleanupRef.current?.();
             } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
               setIsPlaying(false);
             }
@@ -60,6 +120,10 @@ export default function MusicPlayer() {
         },
       });
     }
+
+    return () => {
+      gestureCleanupRef.current?.();
+    };
   }, [cleanTrackId]);
 
   const togglePlay = () => {
@@ -68,9 +132,12 @@ export default function MusicPlayer() {
       return;
     }
     if (isPlaying) {
+      userPausedRef.current = true;
+      gestureCleanupRef.current?.();
       playerRef.current.pauseVideo();
     } else {
-      playerRef.current.playVideo();
+      userPausedRef.current = false;
+      startPlayback(playerRef.current, { muted: false });
     }
   };
 
