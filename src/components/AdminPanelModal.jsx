@@ -48,32 +48,6 @@ export default function AdminPanelModal() {
     setPinError('');
   };
 
-  // Helper for timeline events edit
-  const handleTimelineChange = (id, field, value) => {
-    const updated = config.timelineEvents.map((ev) =>
-      ev.id === id ? { ...ev, [field]: value } : ev
-    );
-    updateConfig('timelineEvents', updated);
-  };
-
-  const addTimelineEvent = () => {
-    const newEv = {
-      id: Date.now().toString(),
-      time: '20:00',
-      title: 'ახალი მოვლენა',
-      desc: 'აღწერა...',
-      iconName: 'Sparkles',
-    };
-    updateConfig('timelineEvents', [...config.timelineEvents, newEv]);
-  };
-
-  const removeTimelineEvent = (id) => {
-    updateConfig(
-      'timelineEvents',
-      config.timelineEvents.filter((ev) => ev.id !== id)
-    );
-  };
-
   const galleryPhotos = Array.isArray(config.galleryPhotos) ? config.galleryPhotos : [];
 
   const handleGalleryPhotoChange = (id, field, value) => {
@@ -436,24 +410,18 @@ export default function AdminPanelModal() {
                 {/* TAB 1: GENERAL & HERO */}
                 {activeTab === 'general' && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <p className="admin-static-note" style={{ gridColumn: '1 / -1' }}>
+                      წყვილის, ჰეროს, ისტორიის, ადგილისა და განრიგის ინფორმაცია ფიქსირებულია და არ იცვლება.
+                    </p>
+
                     <div>
                       <label className="admin-label">პატარძლის სახელი</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.brideName}
-                        onChange={(e) => updateConfig('brideName', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.brideName} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">სიძის სახელი</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.groomName}
-                        onChange={(e) => updateConfig('groomName', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.groomName} readOnly />
                     </div>
 
                     <div style={{ gridColumn: '1 / -1' }}>
@@ -468,51 +436,31 @@ export default function AdminPanelModal() {
 
                     <div style={{ gridColumn: '1 / -1' }}>
                       <label className="admin-label">სათაური / ქვესათაური (Hero Tagline)</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.heroSubtitle}
-                        onChange={(e) => updateConfig('heroSubtitle', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.heroSubtitle} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">თარიღის ტექსტი (Hero Date)</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.dateString}
-                        onChange={(e) => updateConfig('dateString', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.dateString} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">დროის ტექსტი (Hero Time)</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.timeString}
-                        onChange={(e) => updateConfig('timeString', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.timeString} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">ქალაქი / ქვეყანა</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.locationCity}
-                        onChange={(e) => updateConfig('locationCity', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.locationCity} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">Countdown სამიზნე თარიღი</label>
                       <input
-                        className="admin-input"
+                        className="admin-input admin-input-static"
                         type="datetime-local"
                         value={config.countdownTarget.slice(0, 16)}
-                        onChange={(e) => updateConfig('countdownTarget', e.target.value)}
+                        readOnly
                       />
                     </div>
                   </div>
@@ -521,34 +469,20 @@ export default function AdminPanelModal() {
                 {/* TAB 2: STORY */}
                 {activeTab === 'story' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <p className="admin-static-note">ისტორიის ტექსტი ფიქსირებულია და არ იცვლება.</p>
                     <div>
                       <label className="admin-label">სექციის სათაური</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.storyTitle}
-                        onChange={(e) => updateConfig('storyTitle', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.storyTitle} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">ისტორიის ტექსტი</label>
-                      <textarea
-                        className="admin-input"
-                        rows="5"
-                        value={config.storyText}
-                        onChange={(e) => updateConfig('storyText', e.target.value)}
-                      />
+                      <textarea className="admin-input admin-input-static" rows="5" value={config.storyText} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">ხელმოწერა / ხელმოწერები</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.storySignature}
-                        onChange={(e) => updateConfig('storySignature', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.storySignature} readOnly />
                     </div>
                   </div>
                 )}
@@ -741,34 +675,22 @@ export default function AdminPanelModal() {
                 {/* TAB 3: VENUE & DETAILS */}
                 {activeTab === 'venue' && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <p className="admin-static-note" style={{ gridColumn: '1 / -1' }}>
+                      ადგილის ინფორმაცია ფიქსირებულია. დრესკოდის შეცვლა შესაძლებელია.
+                    </p>
                     <div>
                       <label className="admin-label">რესტორანი / ადგილის დასახელება</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.venueName}
-                        onChange={(e) => updateConfig('venueName', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.venueName} readOnly />
                     </div>
 
                     <div>
                       <label className="admin-label">მისამართი / ქალაქი</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.venueAddress}
-                        onChange={(e) => updateConfig('venueAddress', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.venueAddress} readOnly />
                     </div>
 
                     <div style={{ gridColumn: '1 / -1' }}>
                       <label className="admin-label">Google Maps რუკის ბმული (URL)</label>
-                      <input
-                        className="admin-input"
-                        type="text"
-                        value={config.venueMapsUrl}
-                        onChange={(e) => updateConfig('venueMapsUrl', e.target.value)}
-                      />
+                      <input className="admin-input admin-input-static" type="text" value={config.venueMapsUrl} readOnly />
                     </div>
 
                     <div>
@@ -805,11 +727,8 @@ export default function AdminPanelModal() {
                       }}
                     >
                       <span style={{ fontSize: '14px', color: 'var(--ink-muted)' }}>
-                        დღის განრიგის მოვლენები
+                        დღის განრიგი ფიქსირებულია და არ იცვლება
                       </span>
-                      <button onClick={addTimelineEvent} className="btn-primary" style={{ padding: '8px 16px', fontSize: '12px' }}>
-                        <Plus size={14} /> მოვლენის დამატება
-                      </button>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -822,45 +741,14 @@ export default function AdminPanelModal() {
                             borderRadius: '12px',
                             background: '#FDFBF7',
                             display: 'grid',
-                            gridTemplateColumns: '100px 1fr 2fr 40px',
+                            gridTemplateColumns: '100px 1fr 2fr',
                             gap: '12px',
                             alignItems: 'center',
                           }}
                         >
-                          <input
-                            className="admin-input"
-                            type="text"
-                            value={ev.time}
-                            placeholder="18:00"
-                            onChange={(e) => handleTimelineChange(ev.id, 'time', e.target.value)}
-                          />
-                          <input
-                            className="admin-input"
-                            type="text"
-                            value={ev.title}
-                            placeholder="სათაური"
-                            onChange={(e) => handleTimelineChange(ev.id, 'title', e.target.value)}
-                          />
-                          <input
-                            className="admin-input"
-                            type="text"
-                            value={ev.desc}
-                            placeholder="აღწერა"
-                            onChange={(e) => handleTimelineChange(ev.id, 'desc', e.target.value)}
-                          />
-                          <button
-                            onClick={() => removeTimelineEvent(ev.id)}
-                            style={{
-                              background: '#FEE2E2',
-                              color: '#DC2626',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          <input className="admin-input admin-input-static" type="text" value={ev.time} readOnly />
+                          <input className="admin-input admin-input-static" type="text" value={ev.title} readOnly />
+                          <input className="admin-input admin-input-static" type="text" value={ev.desc} readOnly />
                         </div>
                       ))}
                     </div>
@@ -1045,6 +933,23 @@ export default function AdminPanelModal() {
         }
         .admin-input:focus {
           border-color: var(--burgundy);
+        }
+        .admin-input-static {
+          background: #F7F2EC;
+          color: var(--ink-dark);
+          cursor: default;
+        }
+        .admin-input-static:focus {
+          border-color: #EAE2D9;
+        }
+        .admin-static-note {
+          margin: 0;
+          padding: 12px 14px;
+          border-radius: 10px;
+          background: rgba(138, 43, 73, 0.08);
+          color: var(--burgundy);
+          font-size: 13px;
+          font-family: 'Montserrat', sans-serif;
         }
       `}</style>
     </>
