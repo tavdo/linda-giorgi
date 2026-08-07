@@ -53,10 +53,7 @@ export default function RsvpSection() {
       id="rsvp"
       className="section-container"
       style={{
-        background: `
-          radial-gradient(circle at 50% 50%, rgba(234, 185, 195, 0.2) 0%, transparent 70%),
-          var(--cream-base)
-        `,
+        background: 'transparent',
       }}
     >
       <h2 className="section-title">დასწრების დადასტურება</h2>
@@ -155,7 +152,9 @@ export default function RsvpSection() {
                   padding: '14px 18px',
                   borderRadius: '12px',
                   border: '1px solid var(--glass-border)',
-                  background: 'rgba(255, 255, 255, 0.9)',
+                  background: 'rgba(255, 255, 255, 0.75)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
                   fontSize: '16px',
                   fontFamily: 'Cormorant Garamond, serif',
                   color: 'var(--ink-dark)',
@@ -187,7 +186,9 @@ export default function RsvpSection() {
                     padding: '14px 12px',
                     borderRadius: '12px',
                     border: formData.attendance === 'attending' ? '2px solid var(--burgundy)' : '1px solid var(--glass-border)',
-                    background: formData.attendance === 'attending' ? 'var(--cream-soft)' : '#FFFFFF',
+                    background: formData.attendance === 'attending' ? 'rgba(249, 241, 235, 0.85)' : 'rgba(255, 255, 255, 0.65)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
                     color: formData.attendance === 'attending' ? 'var(--burgundy)' : 'var(--ink-muted)',
                     fontWeight: formData.attendance === 'attending' ? 600 : 400,
                     cursor: 'pointer',
@@ -206,7 +207,9 @@ export default function RsvpSection() {
                     padding: '14px 12px',
                     borderRadius: '12px',
                     border: formData.attendance === 'declined' ? '2px solid var(--burgundy)' : '1px solid var(--glass-border)',
-                    background: formData.attendance === 'declined' ? 'var(--cream-soft)' : '#FFFFFF',
+                    background: formData.attendance === 'declined' ? 'rgba(249, 241, 235, 0.85)' : 'rgba(255, 255, 255, 0.65)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
                     color: formData.attendance === 'declined' ? 'var(--burgundy)' : 'var(--ink-muted)',
                     fontWeight: formData.attendance === 'declined' ? 600 : 400,
                     cursor: 'pointer',
@@ -247,7 +250,9 @@ export default function RsvpSection() {
                       padding: '14px 18px',
                       borderRadius: '12px',
                       border: '1px solid var(--glass-border)',
-                      background: 'rgba(255, 255, 255, 0.9)',
+                      background: 'rgba(255, 255, 255, 0.75)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
                       fontSize: '16px',
                       fontFamily: 'Cormorant Garamond, serif',
                       color: 'var(--ink-dark)',
@@ -288,7 +293,9 @@ export default function RsvpSection() {
                       padding: '14px 18px',
                       borderRadius: '12px',
                       border: '1px solid var(--glass-border)',
-                      background: 'rgba(255, 255, 255, 0.9)',
+                      background: 'rgba(255, 255, 255, 0.75)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
                       fontSize: '16px',
                       fontFamily: 'Cormorant Garamond, serif',
                       color: 'var(--ink-dark)',
@@ -326,7 +333,9 @@ export default function RsvpSection() {
                   padding: '14px 18px',
                   borderRadius: '12px',
                   border: '1px solid var(--glass-border)',
-                  background: 'rgba(255, 255, 255, 0.9)',
+                  background: 'rgba(255, 255, 255, 0.75)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
                   fontSize: '16px',
                   fontFamily: 'Cormorant Garamond, serif',
                   color: 'var(--ink-dark)',

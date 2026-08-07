@@ -41,7 +41,7 @@ export default function DetailsSection({ onOpenVenueModal }) {
       id="details"
       className="section-container"
       style={{
-        background: 'linear-gradient(180deg, var(--cream-soft) 0%, var(--cream-base) 100%)',
+        background: 'transparent',
       }}
     >
       <h2 className="section-title">ღონისძიების დეტალები</h2>
@@ -76,7 +76,9 @@ export default function DetailsSection({ onOpenVenueModal }) {
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                background: 'var(--cream-soft)',
+                background: 'rgba(249, 241, 235, 0.6)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

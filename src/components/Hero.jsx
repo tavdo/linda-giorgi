@@ -19,11 +19,7 @@ export default function Hero({ onRsvpClick, onDetailsClick }) {
       id="hero"
       className="section-container"
       style={{
-        background: `
-          radial-gradient(circle at 50% 20%, rgba(234, 185, 195, 0.25) 0%, transparent 60%),
-          radial-gradient(circle at 20% 80%, rgba(169, 212, 230, 0.25) 0%, transparent 60%),
-          linear-gradient(180deg, var(--cream-base) 0%, var(--cream-soft) 100%)
-        `,
+        background: 'transparent',
         textAlign: 'center',
         paddingTop: '100px',
         paddingBottom: '80px',

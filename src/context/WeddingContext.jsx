@@ -21,8 +21,8 @@ const DEFAULT_CONFIG = {
   dressCodeTitle: 'სადღესასწაულო & ელეგანტური',
   dressCodeSub: 'პასტელური & ნაზი ტონები',
   
-  musicTrackId: 'NaZznqme2hg',
-  musicTrackTitle: 'Romantic Symphony',
+  musicTrackId: '-Ai3nowbLU8',
+  musicTrackTitle: 'საქორწინო მელოდია',
 
   footerMessage: 'თქვენი თანადგომა და სითბო ჩვენთვის ამ დღეს კიდევ უფრო განსაკუთრებულს გახდის. მოუთმენლად გელოდებით!',
 
@@ -71,7 +71,15 @@ export function WeddingProvider({ children }) {
   const [config, setConfig] = useState(() => {
     try {
       const saved = localStorage.getItem('wedding_site_config_v1');
-      return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (!parsed.musicTrackId || parsed.musicTrackId === 'NaZznqme2hg') {
+          parsed.musicTrackId = '-Ai3nowbLU8';
+          parsed.musicTrackTitle = 'საქორწინო მელოდია';
+        }
+        return parsed;
+      }
+      return DEFAULT_CONFIG;
     } catch (e) {
       return DEFAULT_CONFIG;
     }

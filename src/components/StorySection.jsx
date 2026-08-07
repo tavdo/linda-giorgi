@@ -10,7 +10,7 @@ export default function StorySection() {
       id="story"
       className="section-container"
       style={{
-        background: 'linear-gradient(180deg, var(--cream-soft) 0%, var(--cream-base) 100%)',
+        background: 'transparent',
       }}
     >
       <div

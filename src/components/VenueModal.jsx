@@ -28,7 +28,9 @@ export default function VenueModal({ isOpen, onClose }) {
       <div
         className="glass-card"
         style={{
-          background: '#FFFFFF',
+          background: 'rgba(255, 255, 255, 0.88)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           maxWidth: '520px',
           width: '100%',
           padding: '36px 30px',

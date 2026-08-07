@@ -22,7 +22,7 @@ export default function TimelineSection() {
       id="timeline"
       className="section-container"
       style={{
-        background: 'var(--cream-base)',
+        background: 'transparent',
       }}
     >
       <h2 className="section-title">დღის განრიგი</h2>
@@ -74,7 +74,9 @@ export default function TimelineSection() {
                   width: '42px',
                   height: '42px',
                   borderRadius: '50%',
-                  background: '#FFFFFF',
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
                   border: '2px solid var(--gold-accent)',
                   display: 'flex',
                   alignItems: 'center',

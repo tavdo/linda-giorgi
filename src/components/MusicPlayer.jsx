@@ -2,9 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { useWedding } from '../context/WeddingContext';
 
+const parseYouTubeId = (input) => {
+  if (!input) return '-Ai3nowbLU8';
+  const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  return match ? match[1] : input.trim();
+};
+
 export default function MusicPlayer() {
   const { config } = useWedding();
   const { musicTrackId, musicTrackTitle } = config;
+
+  const cleanTrackId = parseYouTubeId(musicTrackId);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -28,12 +36,12 @@ export default function MusicPlayer() {
       playerRef.current = new window.YT.Player('yt-hidden-player', {
         height: '1',
         width: '1',
-        videoId: musicTrackId || 'NaZznqme2hg',
+        videoId: cleanTrackId,
         playerVars: {
           autoplay: 0,
           controls: 0,
           loop: 1,
-          playlist: musicTrackId || 'NaZznqme2hg',
+          playlist: cleanTrackId,
           modestbranding: 1,
           disablekb: 1,
           fs: 0,
@@ -52,7 +60,7 @@ export default function MusicPlayer() {
         },
       });
     }
-  }, [musicTrackId]);
+  }, [cleanTrackId]);
 
   const togglePlay = () => {
     if (!playerRef.current || !isLoaded) {

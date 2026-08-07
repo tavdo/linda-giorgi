@@ -30,6 +30,10 @@ function MainLayout() {
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh' }}>
+      {/* Full Website Fixed Background Image & Overlay */}
+      <div className="bg-fixed-image" />
+      <div className="bg-overlay" />
+
       {/* Floating Petals Animation */}
       <PetalsCanvas />
 

@@ -9,10 +9,9 @@ export default function Footer() {
   return (
     <footer
       style={{
-        background: `
-          radial-gradient(circle at 50% 50%, rgba(234, 185, 195, 0.25) 0%, transparent 70%),
-          var(--cream-soft)
-        `,
+        background: 'rgba(255, 255, 255, 0.45)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         padding: '80px 24px 40px',
         textAlign: 'center',
         position: 'relative',

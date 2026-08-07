@@ -1,20 +1,20 @@
 :root {
-  --cream-base: #FDFBF7;
-  --cream-soft: #F9F1EB;
-  --cream-card: #FFFFFF;
+  --cream-base: transparent;
+  --cream-soft: rgba(249, 241, 235, 0.35);
+  --cream-card: rgba(255, 255, 255, 0.68);
   --rose-quartz: #EAB9C3;
   --rose-accent: #D9789E;
-  --burgundy: #8A2B49;
-  --burgundy-deep: #591629;
-  --gold-accent: #C59B27;
+  --burgundy: #7C1E3A;
+  --burgundy-deep: #4A0E1F;
+  --gold-accent: #B88A1D;
   --gold-light: #EAD08B;
   --blue-soft: #A9D4E6;
   --blue-sky: #6BB1D1;
-  --ink-dark: #3A2E32;
-  --ink-muted: #7E6F74;
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(229, 200, 140, 0.4);
-  --glass-shadow: 0 20px 40px rgba(138, 43, 73, 0.07);
+  --ink-dark: #291B20;
+  --ink-muted: #59474E;
+  --glass-bg: rgba(255, 255, 255, 0.68);
+  --glass-border: rgba(229, 200, 140, 0.55);
+  --glass-shadow: 0 20px 45px rgba(74, 14, 31, 0.14);
 }
 
 * {
@@ -30,11 +30,46 @@ html {
 
 body {
   font-family: 'Cormorant Garamond', serif;
-  background-color: var(--cream-base);
+  background-color: #FAF6F0;
   color: var(--ink-dark);
   overflow-x: hidden;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Fixed Full-Page Background Image & Overlay */
+.bg-fixed-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+}
+
+.bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(253, 251, 247, 0.38) 0%,
+    rgba(249, 241, 235, 0.45) 50%,
+    rgba(253, 251, 247, 0.38) 100%
+  );
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
 }
 
 /* Custom Scrollbar */
@@ -42,7 +77,7 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cream-soft);
+  background: rgba(249, 241, 235, 0.5);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--rose-quartz);
@@ -79,16 +114,17 @@ body {
   padding: 80px 24px;
   position: relative;
   z-index: 2;
+  background: transparent !important;
 }
 
 /* Glassmorphism Card Style */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
-  border-radius: 16px;
+  border-radius: 20px;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
