@@ -7,20 +7,21 @@ const DEFAULT_CONFIG = {
   heroSubtitle: 'სიყვარულით გიწვევთ საქორწილო ზეიმზე',
   dateString: '29 აგვისტო, 2026',
   timeString: '18:00 საათი',
-  locationCity: 'თბილისი, საქართველო',
+  locationCity: 'ბათუმი, საქართველო',
   countdownTarget: '2026-08-29T18:00:00',
-  
+
   storyTitle: 'ჩვენი ისტორია',
-  storyText: 'ორი გული, ერთი გზა — და დღეს ის გზა თქვენც გვინდა გაგვიზიაროთ. ვწერთ ახალ თავს ჩვენი ცხოვრების წიგნში და გვსურს, რომ ეს დღე თქვენთან ერთად, სიყვარულითა და სიხარულით სავსე გავიხადოთ.',
+  storyText:
+    'ერთ დღეს უბრალოდ ერთმანეთს შევხვდით, დღეს კი გვინდა, მთელი ცხოვრება ერთად გავატაროთ. ჩვენი სიყვარულის ყველაზე მნიშვნელოვანი დღე ახლოვდება და გვინდა, ეს სიხარული თქვენთან ერთად გავიზიაროთ.',
   storySignature: 'ლინდა & გიორგი',
 
-  venueName: 'რესტორანი „XXXXX“',
-  venueAddress: 'თბილისი, საქართველო',
-  venueMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Tbilisi+Georgia+Wedding+Venue',
-  
+  venueName: 'რესტორანი „ძველი ბათუმი“',
+  venueAddress: 'ბათუმი, საქართველო',
+  venueMapsUrl: 'https://maps.app.goo.gl/FtD6MSLd7C3dC8zC6',
+
   dressCodeTitle: 'სადღესასწაულო & ელეგანტური',
   dressCodeSub: 'პასტელური & ნაზი ტონები',
-  
+
   musicTrackSrc: '/assets/background-music.mp3',
   musicTrackTitle: 'საარშიყო — ჯანსუღ კახიძე',
 
@@ -40,46 +41,103 @@ const DEFAULT_CONFIG = {
     { id: '11', src: '/assets/11.jpeg', alt: 'ლინდა და გიორგი — ფოტო 11', layout: 'tall' },
   ],
 
-  footerMessage: 'თქვენი თანადგომა და სითბო ჩვენთვის ამ დღეს კიდევ უფრო განსაკუთრებულს გახდის. მოუთმენლად გელოდებით!',
+  footerMessage:
+    'თქვენი თანადგომა და სითბო ჩვენთვის ამ დღეს კიდევ უფრო განსაკუთრებულს გახდის. მოუთმენლად გელოდებით!',
 
   timelineEvents: [
     {
       id: '1',
-      time: '17:30',
-      title: 'სტუმრების მიღება',
-      desc: 'მისალმება, კოქტეილი & მისასალმებელი სასმელები',
+      time: '13:00',
+      title: 'შეხვედრა სამი სტუდიაში',
+      desc: 'შეხვედრა',
       iconName: 'GlassWater',
     },
     {
       id: '2',
-      time: '18:00',
-      title: 'საქორწინო ცერემონია',
-      desc: 'სიყვარულის ფიცის დადება & ჯვრისწერა',
-      iconName: 'Heart',
+      time: '13:30',
+      title: 'ფოტოსესია სამი სტუდიაში',
+      desc: 'ფოტოსესია',
+      iconName: 'Sparkles',
     },
     {
       id: '3',
-      time: '19:30',
-      title: 'სადღესასწაულო ვახშამი',
-      desc: 'ქართული სუფრა, პირველი ცეკვა & სადღეგრძელოები',
-      iconName: 'Utensils',
+      time: '15:30',
+      title: 'ხელის მოწერის ცერემონია',
+      desc: 'სიყვარულის ფიცის დადება & ფურშეტი',
+      iconName: 'Heart',
     },
     {
       id: '4',
-      time: '22:00',
-      title: 'ტორტის ჭრა',
-      desc: 'საქორწინო ტორტი & ფეიერვერკი',
-      iconName: 'Cake',
+      time: '17:00',
+      title: 'ფოტოსესია ძველი ბათუმში',
+      desc: 'ფოტოსესია',
+      iconName: 'Sparkles',
     },
     {
       id: '5',
-      time: '22:30',
-      title: 'წვეულება & DJ',
+      time: '18:00',
+      title: 'საქორწილო წვეულება',
       desc: 'ცეკვები & გართობა გვიანობამდე',
       iconName: 'Music',
     },
+    {
+      id: '6',
+      time: '21:30',
+      title: 'ტორტის გაჭრა',
+      desc: 'ტორტის გაჭრა',
+      iconName: 'Cake',
+    },
   ],
 };
+
+// Wedding content that must stay fixed (not overwritten by localStorage / admin edits)
+const STATIC_KEYS = [
+  'brideName',
+  'groomName',
+  'heroSubtitle',
+  'dateString',
+  'timeString',
+  'locationCity',
+  'countdownTarget',
+  'storyTitle',
+  'storyText',
+  'storySignature',
+  'venueName',
+  'venueAddress',
+  'venueMapsUrl',
+  'timelineEvents',
+];
+
+const EDITABLE_KEYS = [
+  'adminPin',
+  'dressCodeTitle',
+  'dressCodeSub',
+  'musicTrackSrc',
+  'musicTrackTitle',
+  'galleryTitle',
+  'gallerySubtitle',
+  'galleryPhotos',
+  'footerMessage',
+];
+
+const pickEditable = (source = {}) => {
+  const next = {};
+  EDITABLE_KEYS.forEach((key) => {
+    if (source[key] !== undefined) next[key] = source[key];
+  });
+  return next;
+};
+
+const withStaticConfig = (source = {}) => ({
+  ...DEFAULT_CONFIG,
+  ...pickEditable(source),
+  galleryPhotos:
+    Array.isArray(source.galleryPhotos) && source.galleryPhotos.length
+      ? source.galleryPhotos
+      : DEFAULT_CONFIG.galleryPhotos,
+  // Always lock wedding details to the fixed defaults
+  ...Object.fromEntries(STATIC_KEYS.map((key) => [key, DEFAULT_CONFIG[key]])),
+});
 
 const WeddingContext = createContext();
 
@@ -89,7 +147,6 @@ export function WeddingProvider({ children }) {
       const saved = localStorage.getItem('wedding_site_config_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Migrate from YouTube IDs to local MP3 background track
         if (!parsed.musicTrackSrc) {
           parsed.musicTrackSrc = DEFAULT_CONFIG.musicTrackSrc;
           if (
@@ -100,16 +157,7 @@ export function WeddingProvider({ children }) {
             parsed.musicTrackTitle = DEFAULT_CONFIG.musicTrackTitle;
           }
         }
-        return {
-          ...DEFAULT_CONFIG,
-          ...parsed,
-          galleryPhotos: Array.isArray(parsed.galleryPhotos) && parsed.galleryPhotos.length
-            ? parsed.galleryPhotos
-            : DEFAULT_CONFIG.galleryPhotos,
-          timelineEvents: Array.isArray(parsed.timelineEvents) && parsed.timelineEvents.length
-            ? parsed.timelineEvents
-            : DEFAULT_CONFIG.timelineEvents,
-        };
+        return withStaticConfig(parsed);
       }
       return DEFAULT_CONFIG;
     } catch (e) {
@@ -129,7 +177,7 @@ export function WeddingProvider({ children }) {
   // Sync config to LocalStorage
   useEffect(() => {
     try {
-      localStorage.setItem('wedding_site_config_v1', JSON.stringify(config));
+      localStorage.setItem('wedding_site_config_v1', JSON.stringify(withStaticConfig(config)));
     } catch (e) {
       console.error('Failed to save wedding config to localStorage:', e);
     }
@@ -145,11 +193,16 @@ export function WeddingProvider({ children }) {
   }, [rsvpResponses]);
 
   const updateConfig = (keyOrObject, value) => {
-    if (typeof keyOrObject === 'object') {
-      setConfig((prev) => ({ ...prev, ...keyOrObject }));
-    } else {
-      setConfig((prev) => ({ ...prev, [keyOrObject]: value }));
-    }
+    setConfig((prev) => {
+      if (typeof keyOrObject === 'object') {
+        const allowed = pickEditable(keyOrObject);
+        return withStaticConfig({ ...prev, ...allowed });
+      }
+      if (!EDITABLE_KEYS.includes(keyOrObject)) {
+        return prev;
+      }
+      return withStaticConfig({ ...prev, [keyOrObject]: value });
+    });
   };
 
   const resetToDefaults = () => {
@@ -183,6 +236,7 @@ export function WeddingProvider({ children }) {
         addRsvpResponse,
         deleteRsvpResponse,
         clearRsvps,
+        isStaticKey: (key) => STATIC_KEYS.includes(key),
       }}
     >
       {children}
