@@ -21,20 +21,26 @@ export default function MusicPlayer() {
   const userPausedRef = useRef(false);
   const gestureCleanupRef = useRef(null);
 
-  const startPlayback = (player = playerRef.current, { muted = false } = {}) => {
+  const startWithSound = (player = playerRef.current) => {
     if (!player || typeof player.playVideo !== 'function') return;
     try {
+      player.unMute();
       player.setVolume(100);
-      if (muted) {
-        player.mute();
-        setIsMuted(true);
-      } else {
-        player.unMute();
-        setIsMuted(false);
-      }
       player.playVideo();
+      setIsMuted(false);
     } catch {
-      // Autoplay may still be blocked until a user gesture
+      // Browser may block until a user gesture
+    }
+  };
+
+  const hasSound = (player = playerRef.current) => {
+    try {
+      return (
+        player?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING &&
+        !player?.isMuted?.()
+      );
+    } catch {
+      return false;
     }
   };
 
@@ -43,8 +49,9 @@ export default function MusicPlayer() {
 
     const onGesture = () => {
       if (userPausedRef.current) return;
-      startPlayback(playerRef.current, { muted: false });
-      cleanup();
+      startWithSound();
+      // Keep listening until sound is actually on (browser may need the gesture)
+      if (hasSound()) cleanup();
     };
 
     const events = ['pointerdown', 'touchstart', 'keydown', 'click'];
@@ -53,7 +60,9 @@ export default function MusicPlayer() {
       gestureCleanupRef.current = null;
     };
 
-    events.forEach((eventName) => document.addEventListener(eventName, onGesture, { once: true, passive: true }));
+    events.forEach((eventName) =>
+      document.addEventListener(eventName, onGesture, { passive: true })
+    );
     gestureCleanupRef.current = cleanup;
   };
 
@@ -77,6 +86,7 @@ export default function MusicPlayer() {
         videoId: cleanTrackId,
         playerVars: {
           autoplay: 1,
+          mute: 0,
           controls: 0,
           loop: 1,
           playlist: cleanTrackId,
@@ -87,24 +97,16 @@ export default function MusicPlayer() {
         events: {
           onReady: (event) => {
             setIsLoaded(true);
-            // Prefer unmuted autoplay; fall back to muted + unmute on first tap
-            startPlayback(event.target, { muted: false });
+            startWithSound(event.target);
+            armGestureFallback();
 
             window.setTimeout(() => {
               if (userPausedRef.current) return;
-              const state = event.target.getPlayerState?.();
-              const playing = state === window.YT?.PlayerState?.PLAYING;
-
-              if (!playing) {
-                startPlayback(event.target, { muted: true });
-              }
-
-              // Unmute / start with sound on first interaction if needed
-              try {
-                if (!playing || event.target.isMuted?.()) {
-                  armGestureFallback();
-                }
-              } catch {
+              if (hasSound(event.target)) {
+                gestureCleanupRef.current?.();
+              } else {
+                // Keep waiting for a tap — never fall back to muted playback
+                startWithSound(event.target);
                 armGestureFallback();
               }
             }, 600);
@@ -112,7 +114,20 @@ export default function MusicPlayer() {
           onStateChange: (event) => {
             if (event.data === window.YT.PlayerState.PLAYING) {
               setIsPlaying(true);
-              gestureCleanupRef.current?.();
+              // Only drop gesture listeners once audio is actually unmuted
+              if (!event.target.isMuted?.()) {
+                gestureCleanupRef.current?.();
+                setIsMuted(false);
+              } else {
+                // YouTube started muted — force unmute; keep gesture fallback if needed
+                startWithSound(event.target);
+                armGestureFallback();
+                try {
+                  setIsMuted(!!event.target.isMuted?.());
+                } catch {
+                  setIsMuted(true);
+                }
+              }
             } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
               setIsPlaying(false);
             }
@@ -137,7 +152,7 @@ export default function MusicPlayer() {
       playerRef.current.pauseVideo();
     } else {
       userPausedRef.current = false;
-      startPlayback(playerRef.current, { muted: false });
+      startWithSound();
     }
   };
 
