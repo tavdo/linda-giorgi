@@ -4,6 +4,7 @@ import PetalsCanvas from './components/PetalsCanvas';
 import MusicPlayer from './components/MusicPlayer';
 import Hero from './components/Hero';
 import StorySection from './components/StorySection';
+import GallerySection from './components/GallerySection';
 import TimelineSection from './components/TimelineSection';
 import DetailsSection from './components/DetailsSection';
 import RsvpSection from './components/RsvpSection';
@@ -45,6 +46,9 @@ function MainLayout() {
 
       {/* Story Section */}
       <StorySection />
+
+      {/* Photo Gallery */}
+      <GallerySection />
 
       {/* Day Schedule / Timeline Section */}
       <TimelineSection />
